@@ -7,29 +7,39 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class GetDocumentFromURL {
-    public static void processElements(Elements el, String str){
-        switch (str){
-            case "blue-link"
-
-        }
+    public static Elements getElements (Element el, String str) {
+        return el.getElementsByClass(str);
     }
-    public static Elements processingDomElement(Element el, String str){
+    public static void procesElements (Element el, String str, CompanyData[] compData, int i) {
         switch (str) {
             case "details":
-                return el.getElementsByClass(str);
+                Elements details = getElements(el, str);
+                 for(Element detail: details){
+                    procesElements(detail, "blue-link", compData, i);
+                    i++;
+                }
+            case "blue-link":
+                Elements blueLinks = getElements(el, str);;
+                for (Element blueLink: blueLinks) {
+                    compData[i+1].setNameCompany(blueLink.text());
+                    //i++;
+                }
+
         }
     }
     public static void main(String[] args) throws IOException, Exception {
         String str = "https://moscow.big-book-avto.ru/gruzovye_avtomobili__tehnika/";
-        String[] classes = new String[10];
-        classes[0] = "details";
-        classes[1] = "blue-link";
         Document doc = Jsoup.connect(str).get();
         Element body = doc.body();//get body
-        Elements details = processingDomElement(body, classes[0]);
-        
+        Elements details = body.getElementsByClass("details");
+        int sizeList  =details.size();
+        CompanyData[] companyDataArr = new CompanyData[sizeList];
+        procesElements(body, "details", companyDataArr, -1);
+        for(CompanyData cpData: companyDataArr){
+            System.out.println(cpData.getNameCompany());
+        }
 
-        for (Element detail : details) {
+        /*for (Element detail : details) {
             CompanyData myCompanyData = new CompanyData();
             Elements tagsView = detail.getElementsByClass("tags_view");
             for(Element tagView: tagsView){
@@ -78,4 +88,4 @@ public class GetDocumentFromURL {
             }*/
         }
     }
-}
+
