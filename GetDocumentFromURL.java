@@ -7,85 +7,69 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class GetDocumentFromURL {
-    public static Elements getElements (Element el, String str) {
+    public static Elements getElements(Element el, String str){
         return el.getElementsByClass(str);
     }
-    public static void procesElements (Element el, String str, CompanyData[] compData, int i) {
+    public static String processElements (Elements el, String str){
         switch (str) {
-            case "details":
-                Elements details = getElements(el, str);
-                 for(Element detail: details){
-                    procesElements(detail, "blue-link", compData, i);
-                    i++;
-                }
             case "blue-link":
-                Elements blueLinks = getElements(el, str);;
-                for (Element blueLink: blueLinks) {
-                    compData[i+1].setNameCompany(blueLink.text());
-                    //i++;
+                for(Element element: el){
+                    return element.text();
                 }
-
+            case "tags_view":
+                for(Element element: el){
+                    return element.text();
+                }
+            case "b":
+                for(Element element: el){
+                    return element.text();
+                }
+            default:
+                return "null";
         }
+    }
+    public static void writeData(String data, CompanyData cd, String className){
+        switch (className) {
+            case "blue-link":
+                cd.setNameCompany(data);
+                break;
+            case "tags_view":
+                cd.setAboutCompany(data);
+                break;
+            case "b":
+                cd.setNameRubrika(data);
+                break;
+        }
+
     }
     public static void main(String[] args) throws IOException, Exception {
         String str = "https://moscow.big-book-avto.ru/gruzovye_avtomobili__tehnika/";
         Document doc = Jsoup.connect(str).get();
         Element body = doc.body();//get body
         Elements details = body.getElementsByClass("details");
-        int sizeList  =details.size();
+        int sizeList = details.size();
         CompanyData[] companyDataArr = new CompanyData[sizeList];
-        procesElements(body, "details", companyDataArr, -1);
-        for(CompanyData cpData: companyDataArr){
-            System.out.println(cpData.getNameCompany());
+        int i = 0;
+        for(Element detail: details){
+            companyDataArr[i] = new CompanyData();
+            Elements elements = getElements(detail, "blue-link");
+            String dataStr = processElements(elements, "blue-link");
+            writeData(dataStr, companyDataArr[i],"blue-link");
+            elements = getElements(detail, "tags_view");
+            for(Element element: elements){
+                Elements elements1 = element.getElementsByTag("b");
+                String dataStr1 = processElements(elements1, "b");
+                writeData(dataStr1, companyDataArr[i],"b");
+            }
+            dataStr = processElements(elements, "tags_view");
+            writeData(dataStr, companyDataArr[i],"tags_view");
+            i++;
         }
-
-        /*for (Element detail : details) {
-            CompanyData myCompanyData = new CompanyData();
-            Elements tagsView = detail.getElementsByClass("tags_view");
-            for(Element tagView: tagsView){
-                String rubrika = "";
-                String aboutComp = "";
-                Elements bTags = tagView.getElementsByTag("b");
-                for(Element bTag: bTags) {
-                    rubrika += bTag.text();
-                }
-                aboutComp += tagsView.text();
-                myCompanyData.setNameRubrika(rubrika);
-                myCompanyData.setAboutCompany(aboutComp);
-            }
-            Elements phoneItems = detail.getElementsByClass("phone-item");
-            int i = 0;
-            String[] arrPhones  = new String[5];
-            for(Element phoneItem: phoneItems){
-                arrPhones[i] = phoneItem.text();
-                i++;
-
-            }
-            String[] arr = new String[i];
-            while(i >0){
-                arr[i-1] = arrPhones[i-1];
-                i--;
-            }
-            myCompanyData.setNumberPhones(arr);
-            System.out.println(myCompanyData.getNameRubrika());
-            System.out.println(myCompanyData.getAboutCompany());
-            for (String str1: myCompanyData.getNumberPhones()){
-                System.out.print(str1 + " #### ");
-            }
-            System.out.println();
-            System.out.println("-//-//-//-");
-/*            String urlLinkAdress = str + (detail.attr("href")).substring(1);
-            Thread.sleep(2000);
-            Document subDoc = Jsoup.connect(urlLinkAdress).get()
-            Element subElement = subDoc.body();//get body
-            Elements urlElements = subElement.getElementsByClass("urls");
-            for(Element urlElrment: urlElements){
-                Elements links = urlElrment.getElementsByTag("a");
-                String urlAdress = "";
-                for(Element linkHref: links) {
-                    urlAdress += linkHref.attr("href");
-                }
-            }*/
+        for(CompanyData point: companyDataArr){
+            System.out.println(point.getNameRubrika());
+            System.out.println(point.getNameCompany());
+            System.out.println(point.getAboutCompany());
         }
     }
+}
 
