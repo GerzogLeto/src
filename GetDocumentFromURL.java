@@ -24,6 +24,10 @@ public class GetDocumentFromURL {
                 for(Element element: el){
                     return element.text();
                 }
+            case "address-info-text":
+                for(Element element: el){
+                    return element.text();
+                }
             default:
                 return "null";
         }
@@ -39,8 +43,23 @@ public class GetDocumentFromURL {
             case "b":
                 cd.setNameRubrika(data);
                 break;
+            case "address-info-text":
+                cd.setAdress(data);
+                break;
         }
 
+    }
+    public static void writeData(String[] data, CompanyData cd){
+        cd.setNumberPhones(data);
+    }
+    public static String[] getTelephones (Elements el){
+        String[] strArr = new String[el.size()];
+        int i = 0;
+        for(Element element: el) {
+            strArr[i] = element.text();
+            i++;
+        }
+        return strArr;
     }
     public static void main(String[] args) throws IOException, Exception {
         String str = "https://moscow.big-book-avto.ru/gruzovye_avtomobili__tehnika/";
@@ -63,12 +82,22 @@ public class GetDocumentFromURL {
             }
             dataStr = processElements(elements, "tags_view");
             writeData(dataStr, companyDataArr[i],"tags_view");
+            elements = getElements(detail, "address-info-text");
+            dataStr = processElements(elements, "address-info-text");
+            writeData(dataStr, companyDataArr[i],"address-info-text");
+            elements = getElements(detail, "phone-item");
+            writeData(getTelephones(elements), companyDataArr[i]);
             i++;
         }
         for(CompanyData point: companyDataArr){
             System.out.println(point.getNameRubrika());
             System.out.println(point.getNameCompany());
             System.out.println(point.getAboutCompany());
+            System.out.println(point.getAdress());
+            for(String str2: point.getNumberPhones()){
+                System.out.print(str2 + " -###- ");
+            }
+            System.out.println();
         }
     }
 }
