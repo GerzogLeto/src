@@ -46,6 +46,9 @@ public class GetDocumentFromURL {
             case "address-info-text":
                 cd.setAdress(data);
                 break;
+            case "url-links":
+                cd.setUrlLink(data);
+                break;
         }
 
     }
@@ -60,6 +63,22 @@ public class GetDocumentFromURL {
             i++;
         }
         return strArr;
+    }
+    public static String getUrlLinks (Element el) throws IOException, Exception {
+        String urlLinkAdress = (el.attr("abs:href"));
+        Thread.sleep(1000);
+        Document subDoc = Jsoup.connect(urlLinkAdress).get();
+        Element subElement = subDoc.body();//get body
+        Elements urlElements = subElement.getElementsByClass("urls");
+        String urlAdress = "";
+        for (Element urlElrment : urlElements) {
+            Elements links = urlElrment.getElementsByTag("a");
+            for (Element linkHref : links) {
+                urlAdress += linkHref.attr("href");
+                urlAdress += " ; ";
+            }
+        }
+        return urlAdress;
     }
     public static void main(String[] args) throws IOException, Exception {
         String str = "https://moscow.big-book-avto.ru/gruzovye_avtomobili__tehnika/";
@@ -87,6 +106,9 @@ public class GetDocumentFromURL {
             writeData(dataStr, companyDataArr[i],"address-info-text");
             elements = getElements(detail, "phone-item");
             writeData(getTelephones(elements), companyDataArr[i]);
+            for(Element element: getElements(detail, "blue-link")){
+                writeData(getUrlLinks(element), companyDataArr[i],"url-links");
+            }
             i++;
         }
         for(CompanyData point: companyDataArr){
@@ -98,6 +120,7 @@ public class GetDocumentFromURL {
                 System.out.print(str2 + " -###- ");
             }
             System.out.println();
+            System.out.println(point.getUrlLink());
         }
     }
 }
