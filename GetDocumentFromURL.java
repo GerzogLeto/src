@@ -66,7 +66,7 @@ public class GetDocumentFromURL {
     }
     public static String getUrlLinks (Element el) throws IOException, Exception {
         String urlLinkAdress = (el.attr("abs:href"));
-        Thread.sleep(1000);
+        Thread.sleep(500);
         Document subDoc = Jsoup.connect(urlLinkAdress).get();
         Element subElement = subDoc.body();//get body
         Elements urlElements = subElement.getElementsByClass("urls");
@@ -79,6 +79,19 @@ public class GetDocumentFromURL {
             }
         }
         return urlAdress;
+    }
+    public static String getString (CompanyData companyData){
+        String telNumbers = "";
+        for(String str: companyData.getNumberPhones()){
+            telNumbers = telNumbers + "|" + str;
+        }
+        String outPut = companyData.getNameRubrika() + "|" +
+                        companyData.getNameCompany() + "|" +
+                        companyData.getUrlLink() + "|" +
+                        companyData.getAdress() + "|" +
+                        companyData.getAboutCompany() +
+                        telNumbers;
+        return outPut;
     }
     public static void main(String[] args) throws IOException, Exception {
         String str = "https://moscow.big-book-avto.ru/gruzovye_avtomobili__tehnika/";
@@ -112,15 +125,7 @@ public class GetDocumentFromURL {
             i++;
         }
         for(CompanyData point: companyDataArr){
-            System.out.println(point.getNameRubrika());
-            System.out.println(point.getNameCompany());
-            System.out.println(point.getAboutCompany());
-            System.out.println(point.getAdress());
-            for(String str2: point.getNumberPhones()){
-                System.out.print(str2 + " -###- ");
-            }
-            System.out.println();
-            System.out.println(point.getUrlLink());
+            System.out.println(getString(point));
         }
     }
 }
