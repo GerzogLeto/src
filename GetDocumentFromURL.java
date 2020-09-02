@@ -1,4 +1,5 @@
 
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.jsoup.Jsoup;
@@ -64,6 +65,7 @@ public class GetDocumentFromURL {
         }
         return strArr;
     }
+
     public static String getUrlLinks (Element el) throws IOException, Exception {
         String urlLinkAdress = (el.attr("abs:href"));
         Thread.sleep(500);
@@ -92,6 +94,14 @@ public class GetDocumentFromURL {
                         companyData.getAboutCompany() +
                         telNumbers;
         return outPut;
+    }
+    public static void writeStringToFile(CompanyData[] arr) throws Exception{
+        FileWriter fileWriter = new FileWriter("file.txt");
+        fileWriter.write("Rubrika|NameCompamy|URL_links|Adress|AboutCompany|Tel_1|Tel_2|Tel_3|Tel_4|Tel_5|Tel_6\t\n");
+        for(CompanyData companyData: arr){
+            fileWriter.write(getString(companyData) + "\t\n");
+        }
+        fileWriter.close();
     }
     public static void main(String[] args) throws IOException, Exception {
         String str = "https://moscow.big-book-avto.ru/gruzovye_avtomobili__tehnika/";
@@ -124,9 +134,7 @@ public class GetDocumentFromURL {
             }
             i++;
         }
-        for(CompanyData point: companyDataArr){
-            System.out.println(getString(point));
-        }
+        writeStringToFile(companyDataArr);
     }
 }
 
